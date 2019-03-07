@@ -18,21 +18,6 @@ taches(Taches):-
     tache(3, [1], m2, _),
     tache(6, [7,8], m2, _)).
 
-/*ite(Tab, Count, Count):-
-    Kermit is Tab[Count],
-    writeln(Kermit).
-
-ite(Tab, Count, Dim):-
-    Kermit is Tab[Count],
-    writeln(Kermit),
-    Z is Count + 1,
-    ite(Tab, Z, Dim).
-
-iterator(X):-
-    taches(X),
-    dim(X, [Dim]),
-    ite(X, 1, Dim).*/
-
 iterator(Tab):-
     taches(Tab),
     (foreachelem(Elem, Tab) do
@@ -41,18 +26,22 @@ iterator(Tab):-
 
 domaines(Taches, Fin):-
     taches(Taches),
-    (foreachelem(tache(W,N,_,Z), Taches), param(Fin) do
-        Z #> 0,
-        Fin #:: 1..100,
+    (foreachelem(tache(Duree, _Pred, _Machine, Debut), Taches), param(Fin) do
+        Fin #> 0,
         labeling([Fin]),
-        DebutMax is Fin - W,
-        Z #< DebutMax
+        Debut #> 0,
+        DebutMax is Fin - Duree,
+        Debut #=< DebutMax
     ).
 
 getVarList(Taches, Fin, List):-
-    domaines(Taches, Fin),
-    (foreach(tache(W,X,Y,Z), Taches),
+    (foreachelem(tache(W,X,Y,Z), Taches),
         fromto([], In, Out, List) do
             append(In, [W,X,Y,Z], Out)
     ).
 
+resoudre(Tache, Fin):-
+    taches(Tache),
+    domaines(Tache, Fin),
+    getVarList(Tache, Fin, List),
+    labeling([List]).
